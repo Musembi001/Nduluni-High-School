@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Student, PaymentTransaction } from '../types';
 import { SCHOOL_INFO, INITIAL_STUDENTS, MOCK_FEE_STRUCTURE, INITIAL_TRANSACTIONS } from '../data/mockData';
+import { generateFeeStatementPDF } from '../utils/pdfGenerator';
 import { 
   CreditCard, 
   Smartphone, 
@@ -17,7 +18,13 @@ import {
   Check,
   RefreshCw,
   MessageSquare,
-  Radio
+  Radio,
+  History,
+  Clock,
+  Filter,
+  Eye,
+  TrendingUp,
+  X
 } from 'lucide-react';
 
 interface FeePaymentSystemProps {
@@ -32,7 +39,11 @@ export const FeePaymentSystem: React.FC<FeePaymentSystemProps> = ({
   const [studentsList, setStudentsList] = useState<Student[]>(INITIAL_STUDENTS);
   const [transactions, setTransactions] = useState<PaymentTransaction[]>(INITIAL_TRANSACTIONS);
   const [smsLogs, setSmsLogs] = useState<any[]>([]);
-  const [activeTab, setActiveTab] = useState<'pay' | 'sms_logs'>('pay');
+  const [activeTab, setActiveTab] = useState<'pay' | 'history' | 'sms_logs'>('pay');
+  const [historySearch, setHistorySearch] = useState('');
+  const [historyChannel, setHistoryChannel] = useState<'ALL' | 'M-PESA' | 'Bank Deposit'>('ALL');
+  const [historyAdmission, setHistoryAdmission] = useState<'ALL' | string>('ALL');
+  const [inspectingTxn, setInspectingTxn] = useState<PaymentTransaction | null>(null);
 
   const [activeAdmissionNo, setActiveAdmissionNo] = useState(
     initialAdmissionNo || studentsList[0]?.admissionNo || 'NHS/3412/2023'
@@ -271,21 +282,49 @@ export const FeePaymentSystem: React.FC<FeePaymentSystemProps> = ({
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2">
             <button
-              onClick={() => setActiveTab(activeTab === 'pay' ? 'sms_logs' : 'pay')}
-              className="px-3.5 py-2.5 text-xs font-semibold text-stone-200 bg-stone-800 hover:bg-stone-700 rounded-lg transition-colors flex items-center gap-2 cursor-pointer"
+              onClick={() => setActiveTab('pay')}
+              className={`px-3 py-2 text-xs font-semibold rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer ${
+                activeTab === 'pay'
+                  ? 'bg-amber-400 text-stone-950 font-bold shadow-xs'
+                  : 'text-stone-200 bg-stone-800 hover:bg-stone-700'
+              }`}
             >
-              <MessageSquare className="w-4 h-4 text-sky-400" />
-              <span>{activeTab === 'pay' ? `View Parent SMS Logs (${smsLogs.length})` : 'Return to Payment Portal'}</span>
+              <CreditCard className="w-3.5 h-3.5" />
+              <span>Make Fee Payment</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('history')}
+              className={`px-3 py-2 text-xs font-semibold rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer ${
+                activeTab === 'history'
+                  ? 'bg-amber-400 text-stone-950 font-bold shadow-xs'
+                  : 'text-stone-200 bg-stone-800 hover:bg-stone-700'
+              }`}
+            >
+              <History className="w-3.5 h-3.5" />
+              <span>Transaction History ({transactions.length})</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('sms_logs')}
+              className={`px-3 py-2 text-xs font-semibold rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer ${
+                activeTab === 'sms_logs'
+                  ? 'bg-amber-400 text-stone-950 font-bold shadow-xs'
+                  : 'text-stone-200 bg-stone-800 hover:bg-stone-700'
+              }`}
+            >
+              <Radio className="w-3.5 h-3.5 text-emerald-400" />
+              <span>Parent SMS Logs ({smsLogs.length})</span>
             </button>
 
             <button
               onClick={onNavigateToPortal}
-              className="px-4 py-2.5 text-xs font-semibold text-stone-900 bg-white hover:bg-stone-100 rounded-lg transition-colors flex items-center justify-center gap-2 cursor-pointer"
+              className="px-3 py-2 text-xs font-semibold text-stone-900 bg-white hover:bg-stone-100 rounded-lg transition-colors flex items-center justify-center gap-1 cursor-pointer ml-1"
             >
-              <span>View Academic Portal</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              <span>Academic Portal</span>
+              <ArrowRight className="w-3 h-3" />
             </button>
           </div>
         </div>
@@ -562,13 +601,24 @@ export const FeePaymentSystem: React.FC<FeePaymentSystemProps> = ({
                   <Receipt className="w-5 h-5 text-rose-950" />
                   <span className="font-bold text-sm text-stone-900 font-display">Official School Receipt</span>
                 </div>
-                <button
-                  onClick={handlePrintReceipt}
-                  className="no-print px-3 py-1.5 text-xs font-semibold text-stone-700 bg-stone-100 hover:bg-stone-200 rounded flex items-center gap-1.5 cursor-pointer"
-                >
-                  <Printer className="w-3.5 h-3.5" />
-                  <span>Print Receipt</span>
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => generateFeeStatementPDF(currentStudent, transactions.filter(t => t.admissionNo === currentStudent.admissionNo))}
+                    className="no-print px-3 py-1.5 text-xs font-bold text-stone-950 bg-amber-400 hover:bg-amber-300 rounded flex items-center gap-1.5 shadow-sm cursor-pointer hover:scale-102"
+                    title="Generate official printable PDF statement"
+                  >
+                    <Download className="w-3.5 h-3.5 text-stone-950" />
+                    <span>Download Statement (PDF)</span>
+                  </button>
+
+                  <button
+                    onClick={handlePrintReceipt}
+                    className="no-print px-3 py-1.5 text-xs font-semibold text-stone-700 bg-stone-100 hover:bg-stone-200 rounded flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <Printer className="w-3.5 h-3.5" />
+                    <span>Print Receipt</span>
+                  </button>
+                </div>
               </div>
 
               {/* Receipt Preview Body */}
@@ -665,7 +715,229 @@ export const FeePaymentSystem: React.FC<FeePaymentSystemProps> = ({
                   </div>
                 ))}
               </div>
+
+              <div className="pt-2 border-t border-stone-100">
+                <button
+                  onClick={() => setActiveTab('history')}
+                  className="w-full py-2.5 text-xs font-bold text-rose-950 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs hover:scale-101"
+                >
+                  <History className="w-3.5 h-3.5 text-rose-800" />
+                  <span>Open Full Transaction History & Status Ledger ({transactions.length})</span>
+                </button>
+              </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* VIEW 2: Complete Transaction History & Status Updates */}
+      {activeTab === 'history' && (
+        <div className="bg-white rounded-xl border border-stone-200 p-6 sm:p-8 shadow-sm space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-stone-200 pb-4">
+            <div>
+              <h2 className="text-xl font-bold font-display text-stone-900 flex items-center gap-2">
+                <History className="w-5 h-5 text-rose-950" />
+                <span>Transaction History & Real-Time Status Updates</span>
+              </h2>
+              <p className="text-xs text-stone-500 mt-0.5">
+                Official audit ledger of all fee remittances processed via Safaricom Lipa Na M-Pesa Paybill 522123, Co-op Bank vouchers, and MoE Capitation accounts.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => generateFeeStatementPDF(currentStudent, transactions.filter(t => historyAdmission === 'ALL' || t.admissionNo === historyAdmission))}
+                className="px-3.5 py-2 text-xs font-bold text-stone-950 bg-amber-400 hover:bg-amber-300 rounded-lg transition-all flex items-center gap-1.5 shadow-2xs cursor-pointer hover:scale-102"
+              >
+                <Download className="w-3.5 h-3.5 text-stone-950" />
+                <span>Download Statement (PDF)</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Key Financial KPIs / Status Summary */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="p-4 bg-stone-50 rounded-xl border border-stone-200 space-y-1">
+              <span className="text-[11px] uppercase tracking-wider text-stone-500 font-semibold">Total Reconciled Collections</span>
+              <div className="text-xl font-bold font-mono text-emerald-800">
+                KES {transactions.reduce((acc, t) => acc + (t.status === 'Completed' ? t.amount : 0), 0).toLocaleString()}
+              </div>
+              <p className="text-[11px] text-stone-500">Real-time MoE Account Ledger</p>
+            </div>
+
+            <div className="p-4 bg-stone-50 rounded-xl border border-stone-200 space-y-1">
+              <span className="text-[11px] uppercase tracking-wider text-stone-500 font-semibold">Cleared Transactions</span>
+              <div className="text-xl font-bold font-mono text-stone-900">
+                {transactions.filter(t => t.status === 'Completed').length} / {transactions.length}
+              </div>
+              <div className="flex items-center gap-1 text-[11px] text-emerald-700 font-semibold">
+                <CheckCircle2 className="w-3 h-3" />
+                <span>100% Successful Reconciliation</span>
+              </div>
+            </div>
+
+            <div className="p-4 bg-stone-50 rounded-xl border border-stone-200 space-y-1">
+              <span className="text-[11px] uppercase tracking-wider text-stone-500 font-semibold">Safaricom Daraja Status</span>
+              <div className="text-xl font-bold font-display text-emerald-700">Online & Live</div>
+              <p className="text-[11px] text-stone-500">Instant STK Webhook Active</p>
+            </div>
+
+            <div className="p-4 bg-stone-50 rounded-xl border border-stone-200 space-y-1">
+              <span className="text-[11px] uppercase tracking-wider text-stone-500 font-semibold">Selected Scholar Balance</span>
+              <div className="text-xl font-bold font-mono text-rose-950">
+                {currentStudent.currentTermBalance === 0 ? 'KES 0 (Cleared)' : `KES ${currentStudent.currentTermBalance.toLocaleString()}`}
+              </div>
+              <p className="text-[11px] text-stone-500 truncate">{currentStudent.fullName}</p>
+            </div>
+          </div>
+
+          {/* Filter & Search Toolbar */}
+          <div className="flex flex-wrap items-center justify-between gap-3 p-4 bg-stone-50 rounded-xl border border-stone-200 text-xs">
+            <div className="flex flex-wrap items-center gap-3 flex-1 min-w-[280px]">
+              {/* Search */}
+              <div className="relative flex-1 min-w-[200px] max-w-sm">
+                <Search className="w-3.5 h-3.5 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  placeholder="Search receipt, reference, or candidate..."
+                  value={historySearch}
+                  onChange={(e) => setHistorySearch(e.target.value)}
+                  className="w-full pl-8 pr-3 py-1.5 rounded-lg border border-stone-300 bg-white font-medium focus:outline-none focus:ring-1 focus:ring-rose-950"
+                />
+              </div>
+
+              {/* Channel Filter */}
+              <div className="flex items-center gap-1">
+                {(['ALL', 'M-PESA', 'Bank Deposit'] as const).map((ch) => (
+                  <button
+                    key={ch}
+                    onClick={() => setHistoryChannel(ch)}
+                    className={`px-2.5 py-1.5 rounded-md font-semibold transition-all cursor-pointer ${
+                      historyChannel === ch
+                        ? 'bg-rose-950 text-white shadow-2xs'
+                        : 'bg-white text-stone-700 border border-stone-200 hover:bg-stone-100'
+                    }`}
+                  >
+                    {ch}
+                  </button>
+                ))}
+              </div>
+
+              {/* Student Filter */}
+              <div>
+                <select
+                  value={historyAdmission}
+                  onChange={(e) => setHistoryAdmission(e.target.value)}
+                  className="px-2.5 py-1.5 rounded-lg border border-stone-300 bg-white font-medium"
+                >
+                  <option value="ALL">All Enrolled Scholars</option>
+                  {studentsList.map((s) => (
+                    <option key={s.id} value={s.admissionNo}>
+                      {s.fullName} ({s.admissionNo})
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {(historySearch || historyChannel !== 'ALL' || historyAdmission !== 'ALL') && (
+              <button
+                onClick={() => {
+                  setHistorySearch('');
+                  setHistoryChannel('ALL');
+                  setHistoryAdmission('ALL');
+                }}
+                className="text-rose-900 hover:underline font-semibold cursor-pointer"
+              >
+                Reset Filters
+              </button>
+            )}
+          </div>
+
+          {/* Transactions Table with Live Status Updates */}
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr className="bg-stone-900 text-white font-medium">
+                  <th className="py-3 px-3">Receipt No</th>
+                  <th className="py-3 px-3">Candidate / Student</th>
+                  <th className="py-3 px-3">Channel & Ref Code</th>
+                  <th className="py-3 px-3 text-right">Amount (KES)</th>
+                  <th className="py-3 px-3">Date & Timestamp</th>
+                  <th className="py-3 px-3">Clearance Status & Audit Update</th>
+                  <th className="py-3 px-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-stone-200">
+                {transactions
+                  .filter((t) => {
+                    const matchesSearch =
+                      t.studentName.toLowerCase().includes(historySearch.toLowerCase()) ||
+                      t.admissionNo.toLowerCase().includes(historySearch.toLowerCase()) ||
+                      t.referenceCode.toLowerCase().includes(historySearch.toLowerCase()) ||
+                      t.receiptNo.toLowerCase().includes(historySearch.toLowerCase());
+                    const matchesChannel =
+                      historyChannel === 'ALL' || t.paymentMethod === historyChannel;
+                    const matchesAdmission =
+                      historyAdmission === 'ALL' || t.admissionNo === historyAdmission;
+                    return matchesSearch && matchesChannel && matchesAdmission;
+                  })
+                  .map((t) => {
+                    const isMpesa = t.paymentMethod === 'M-PESA';
+                    return (
+                      <tr key={t.id} className="hover:bg-stone-50/80 transition-colors">
+                        <td className="py-3 px-3 font-mono font-bold text-rose-950">
+                          {t.receiptNo}
+                        </td>
+                        <td className="py-3 px-3">
+                          <span className="font-bold text-stone-900 block">{t.studentName}</span>
+                          <span className="font-mono text-stone-500 text-[11px]">{t.admissionNo}</span>
+                        </td>
+                        <td className="py-3 px-3">
+                          <div className="flex items-center gap-1.5 font-medium">
+                            {isMpesa ? (
+                              <Smartphone className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                            ) : (
+                              <Building2 className="w-3.5 h-3.5 text-rose-900 shrink-0" />
+                            )}
+                            <span className="text-stone-800">{t.paymentMethod}</span>
+                          </div>
+                          <span className="font-mono text-stone-600 text-[11px] block">{t.referenceCode}</span>
+                        </td>
+                        <td className="py-3 px-3 text-right font-mono font-bold text-stone-900 text-sm">
+                          KES {t.amount.toLocaleString()}
+                        </td>
+                        <td className="py-3 px-3 text-stone-600 font-mono text-[11px]">
+                          {t.date}
+                        </td>
+                        <td className="py-3 px-3">
+                          <div className="space-y-0.5">
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-900 border border-emerald-300">
+                              <CheckCircle2 className="w-3 h-3 text-emerald-700" />
+                              <span>{t.status}</span>
+                            </span>
+                            <p className="text-[10px] text-stone-500">
+                              {isMpesa ? "Daraja STK Push Confirmed & Credited" : "Verified at Co-op Bank Machakos"}
+                            </p>
+                          </div>
+                        </td>
+                        <td className="py-3 px-3 text-right">
+                          <button
+                            onClick={() => {
+                              setInspectingTxn(t);
+                              setLastReceipt(t);
+                            }}
+                            className="px-2.5 py-1 text-xs font-semibold text-rose-950 bg-rose-50 border border-rose-200 rounded hover:bg-rose-100 transition-colors inline-flex items-center gap-1 cursor-pointer"
+                          >
+                            <Eye className="w-3 h-3" />
+                            <span>Receipt</span>
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+              </tbody>
+            </table>
           </div>
         </div>
       )}
@@ -774,6 +1046,99 @@ export const FeePaymentSystem: React.FC<FeePaymentSystemProps> = ({
                 className="py-2 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-500 rounded-lg shadow cursor-pointer"
               >
                 Confirm Payment
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Official Receipt & Transaction Status Inspection Modal */}
+      {inspectingTxn && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-stone-200 space-y-4 animate-in fade-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between border-b border-stone-200 pb-3">
+              <div className="flex items-center gap-2">
+                <Receipt className="w-5 h-5 text-rose-950" />
+                <div>
+                  <h3 className="font-bold text-sm text-stone-900 font-display">
+                    Official Bursary Receipt & Clearance Record
+                  </h3>
+                  <span className="text-[11px] font-mono text-stone-500">
+                    {inspectingTxn.receiptNo} · {inspectingTxn.date}
+                  </span>
+                </div>
+              </div>
+              <button
+                onClick={() => setInspectingTxn(null)}
+                className="text-stone-400 hover:text-stone-700 p-1 cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Receipt Card Body */}
+            <div className="p-4 bg-stone-50 border border-stone-200 rounded-xl space-y-3 font-mono text-xs">
+              <div className="text-center pb-2 border-b border-stone-200">
+                <p className="font-bold text-stone-900 text-sm">{SCHOOL_INFO.name}</p>
+                <p className="text-[10px] text-stone-500">Bursar's Office · MoE Center Code: 12314502</p>
+              </div>
+
+              <div className="space-y-1.5 text-[11px]">
+                <div className="flex justify-between">
+                  <span className="text-stone-500 font-sans">Student Name:</span>
+                  <span className="font-bold text-stone-900">{inspectingTxn.studentName}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-stone-500 font-sans">Admission No:</span>
+                  <span className="font-bold text-stone-900">{inspectingTxn.admissionNo}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-stone-500 font-sans">Payment Channel:</span>
+                  <span className="font-bold text-emerald-800">{inspectingTxn.paymentMethod}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-stone-500 font-sans">Reference / Slip No:</span>
+                  <span className="font-bold text-stone-900">{inspectingTxn.referenceCode}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-stone-500 font-sans">Academic Term:</span>
+                  <span className="text-stone-700">{inspectingTxn.term}</span>
+                </div>
+              </div>
+
+              <div className="pt-2 border-t border-stone-200 flex justify-between items-center text-sm font-bold">
+                <span className="font-sans">AMOUNT RECEIVED:</span>
+                <span className="text-rose-950 font-mono text-base">
+                  KES {inspectingTxn.amount.toLocaleString()}.00
+                </span>
+              </div>
+
+              <div className="p-2.5 bg-emerald-50 border border-emerald-200 rounded text-[11px] text-emerald-900 flex items-center justify-between">
+                <span className="flex items-center gap-1 font-sans font-bold">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700" />
+                  <span>STATUS: {inspectingTxn.status}</span>
+                </span>
+                <span className="text-[10px] text-emerald-700 font-sans">Daraja 2.0 Webhook Verified</span>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between pt-2">
+              <button
+                onClick={() => {
+                  const targetStd = studentsList.find(s => s.admissionNo === inspectingTxn.admissionNo) || currentStudent;
+                  generateFeeStatementPDF(targetStd, [inspectingTxn]);
+                }}
+                className="px-4 py-2 text-xs font-bold text-stone-950 bg-amber-400 hover:bg-amber-300 rounded-lg flex items-center gap-1.5 shadow-2xs transition-all cursor-pointer hover:scale-102"
+              >
+                <Download className="w-3.5 h-3.5 text-stone-950" />
+                <span>Download PDF Statement</span>
+              </button>
+
+              <button
+                onClick={() => setInspectingTxn(null)}
+                className="px-4 py-2 text-xs font-semibold text-stone-700 bg-stone-100 hover:bg-stone-200 rounded-lg cursor-pointer"
+              >
+                Close
               </button>
             </div>
           </div>

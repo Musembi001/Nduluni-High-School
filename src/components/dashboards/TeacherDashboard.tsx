@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { INITIAL_STUDENTS } from '../../data/mockData';
+import { generateClassBroadsheetPDF, generateStudentReportPDF } from '../../utils/pdfGenerator';
 import { 
   Award, 
   BookOpen, 
@@ -14,7 +15,8 @@ import {
   FileText,
   Users,
   Check,
-  AlertCircle
+  AlertCircle,
+  Download
 } from 'lucide-react';
 
 export const TeacherDashboard: React.FC = () => {
@@ -120,11 +122,20 @@ export const TeacherDashboard: React.FC = () => {
 
           <div className="flex flex-wrap items-center gap-3">
             <button
+              onClick={() => generateClassBroadsheetPDF(selectedForm, selectedStream, filteredStudents, selectedSubjectCode)}
+              className="px-4 py-2.5 text-xs font-bold text-stone-950 bg-amber-400 hover:bg-amber-300 rounded-lg transition-all flex items-center gap-1.5 shadow-sm cursor-pointer hover:scale-102"
+              title="Generate printable PDF broadsheet with KNEC mean score statistics"
+            >
+              <Download className="w-4 h-4 text-stone-950" />
+              <span>Download Broadsheet (PDF)</span>
+            </button>
+
+            <button
               onClick={() => window.print()}
               className="px-4 py-2.5 text-xs font-semibold text-stone-900 bg-white hover:bg-stone-100 rounded-lg transition-colors flex items-center gap-1.5 shadow-sm cursor-pointer"
             >
               <Printer className="w-4 h-4 text-stone-700" />
-              <span>Print Class Broadsheet</span>
+              <span>Print Browser View</span>
             </button>
           </div>
         </div>
@@ -275,13 +286,42 @@ export const TeacherDashboard: React.FC = () => {
                       {sub.teacherRemarks}
                     </td>
                     <td className="py-2.5 px-3 text-right">
-                      <button
-                        onClick={() => openMarkEditor(std)}
-                        className="px-3 py-1 text-xs font-semibold text-rose-900 bg-rose-50 border border-rose-200 rounded hover:bg-rose-100 transition-colors flex items-center gap-1 ml-auto cursor-pointer"
-                      >
-                        <Edit3 className="w-3 h-3" />
-                        <span>Edit Marks</span>
-                      </button>
+                      <div className="flex items-center justify-end gap-1.5">
+                        <button
+                          onClick={() => {
+                            const reportPayload = {
+                              term: 1,
+                              year: 2026,
+                              meanGrade: std.termSummary?.meanGrade || 'A-',
+                              totalPoints: std.termSummary?.totalPoints || 74,
+                              meanScore: std.termSummary?.meanScore || 78.4,
+                              streamRank: std.termSummary?.streamRank || 3,
+                              streamTotal: std.termSummary?.streamTotal || 58,
+                              overallRank: std.termSummary?.overallRank || 12,
+                              overallTotal: std.termSummary?.overallTotal || 295,
+                              closingDate: '03 Apr 2026',
+                              openingDate: '04 May 2026',
+                              classTeacherComment: std.termSummary?.classTeacherComment || 'Consistent academic discipline and aptitude.',
+                              principalComment: std.termSummary?.principalComment || 'Keep striving for the highest honors in KCSE.',
+                              subjects: std.subjects || [sub]
+                            };
+                            generateStudentReportPDF(std, reportPayload);
+                          }}
+                          className="px-2 py-1 text-xs font-semibold text-stone-700 bg-stone-100 hover:bg-stone-200 border border-stone-300 rounded transition-colors flex items-center gap-1 cursor-pointer"
+                          title="Generate printable PDF report card for this scholar"
+                        >
+                          <Download className="w-3 h-3 text-stone-600" />
+                          <span>PDF</span>
+                        </button>
+
+                        <button
+                          onClick={() => openMarkEditor(std)}
+                          className="px-2.5 py-1 text-xs font-semibold text-rose-900 bg-rose-50 border border-rose-200 rounded hover:bg-rose-100 transition-colors flex items-center gap-1 cursor-pointer"
+                        >
+                          <Edit3 className="w-3 h-3" />
+                          <span>Edit</span>
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 );

@@ -46,6 +46,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, onSelectTab }) => {
     { id: 'overview', label: 'Overview' },
     { id: 'my_dashboard', label: getDashboardLabel(), highlight: true },
     { id: 'fees', label: 'Online Fee Pay' },
+    { id: 'library', label: 'Library & OPAC' },
     { id: 'calendar', label: 'Event Calendar' },
     { id: 'academics', label: 'Academics & KCSE' },
     { id: 'admissions', label: 'Admissions' },

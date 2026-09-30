@@ -9,6 +9,7 @@ import { Navbar } from './components/Navbar';
 import { HeroSection } from './components/HeroSection';
 import { StudentPortal } from './components/StudentPortal';
 import { FeePaymentSystem } from './components/FeePaymentSystem';
+import { LibraryPortal } from './components/LibraryPortal';
 import { EventCalendar } from './components/EventCalendar';
 import { AcademicsSection } from './components/AcademicsSection';
 import { AdmissionsSection } from './components/AdmissionsSection';
@@ -72,6 +73,10 @@ function MainAppContent() {
             initialAdmissionNo={targetAdmissionNo} 
             onNavigateToPortal={handleNavigateToPortal}
           />
+        )}
+
+        {currentTab === 'library' && (
+          <LibraryPortal onNavigateToPortal={handleNavigateToPortal} />
         )}
 
         {currentTab === 'calendar' && (

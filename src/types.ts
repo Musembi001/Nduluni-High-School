@@ -88,3 +88,52 @@ export interface Announcement {
   author: string;
   isUrgent?: boolean;
 }
+
+export interface Book {
+  id: string;
+  accessionNo: string;
+  isbn: string;
+  title: string;
+  author: string;
+  publisher: string;
+  year: number;
+  category: 'KICD Set Books' | 'Sciences & STEM' | 'Mathematics' | 'Languages & Humanities' | 'KCSE Revision' | 'General Reference';
+  formLevel: string;
+  shelfLocation: string;
+  coverGradient: string;
+  totalCopies: number;
+  availableCopies: number;
+  status: 'Available' | 'Low Stock' | 'Reserved' | 'On Loan';
+  synopsis: string;
+  isSetBook?: boolean;
+}
+
+export interface BorrowRecord {
+  id: string;
+  bookId: string;
+  bookTitle: string;
+  accessionNo: string;
+  studentAdmNo: string;
+  studentName: string;
+  borrowDate: string;
+  dueDate: string;
+  returnDate?: string;
+  status: 'Active' | 'Returned' | 'Overdue';
+  renewalsCount: number;
+  fineAmount: number;
+}
+
+export interface BookReservation {
+  id: string;
+  bookId: string;
+  bookTitle: string;
+  accessionNo: string;
+  studentAdmNo: string;
+  studentName: string;
+  reservationDate: string;
+  pickupSlot: string;
+  pickupCounter: string;
+  status: 'Ready for Pickup' | 'Collected' | 'Cancelled';
+  expiryDate: string;
+}
+

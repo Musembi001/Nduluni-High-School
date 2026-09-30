@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Student, TermReport } from '../types';
 import { SCHOOL_INFO, INITIAL_STUDENTS, MOCK_TERM_REPORT, TIMETABLE_SAMPLE } from '../data/mockData';
+import { generateStudentReportPDF, generateFeeStatementPDF } from '../utils/pdfGenerator';
+import { LibraryPortal } from './LibraryPortal';
 import { 
   GraduationCap, 
   Printer, 
@@ -31,7 +33,7 @@ interface StudentPortalProps {
 export const StudentPortal: React.FC<StudentPortalProps> = ({ onNavigateToFees }) => {
   const [selectedStudent, setSelectedStudent] = useState<Student>(INITIAL_STUDENTS[0]);
   const [searchAdm, setSearchAdm] = useState('');
-  const [activeTab, setActiveTab] = useState<'report' | 'timetable' | 'attendance' | 'resources' | 'grading'>('report');
+  const [activeTab, setActiveTab] = useState<'report' | 'timetable' | 'attendance' | 'library' | 'resources' | 'grading'>('report');
   const [reportData, setReportData] = useState<TermReport>(MOCK_TERM_REPORT);
   const [searchMessage, setSearchMessage] = useState<string | null>(null);
 
@@ -234,6 +236,15 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({ onNavigateToFees }
             >
               <SlidersHorizontal className="w-4 h-4" />
               <span>{isTeacherMode ? 'Teacher Mode: Active' : 'Enable Teacher Mode'}</span>
+            </button>
+
+            <button
+              onClick={() => generateStudentReportPDF(selectedStudent, reportData)}
+              className="px-4 py-2.5 text-xs font-bold text-stone-950 bg-amber-400 hover:bg-amber-300 rounded-lg transition-colors flex items-center justify-center gap-2 shadow-sm cursor-pointer hover:scale-102 active:scale-98"
+              title="Generate printable PDF with official letterhead and stamp"
+            >
+              <Download className="w-4 h-4 text-stone-950" />
+              <span>Download Report (PDF)</span>
             </button>
 
             <button
@@ -440,6 +451,21 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({ onNavigateToFees }
         </button>
 
         <button
+          onClick={() => setActiveTab('library')}
+          className={`px-4 py-2.5 text-xs font-semibold rounded-t-lg transition-colors cursor-pointer flex items-center gap-2 ${
+            activeTab === 'library'
+              ? 'bg-white border-t border-x border-stone-200 text-rose-900 shadow-sm'
+              : 'text-stone-600 hover:text-stone-900'
+          }`}
+        >
+          <BookOpen className="w-4 h-4 text-amber-500" />
+          <span>Library & OPAC</span>
+          <span className="text-[10px] bg-emerald-100 text-emerald-900 font-bold px-1.5 py-0.2 rounded-full">
+            Catalog
+          </span>
+        </button>
+
+        <button
           onClick={() => setActiveTab('resources')}
           className={`px-4 py-2.5 text-xs font-semibold rounded-t-lg transition-colors cursor-pointer flex items-center gap-2 ${
             activeTab === 'resources'
@@ -614,6 +640,41 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({ onNavigateToFees }
               </div>
             </div>
           </div>
+
+          {/* Official Document Export Bar */}
+          <div className="no-print p-5 bg-gradient-to-r from-stone-900 to-rose-950 text-white rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm border border-stone-800">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-amber-400 text-stone-950 flex items-center justify-center shrink-0">
+                <FileText className="w-5 h-5" />
+              </div>
+              <div className="space-y-0.5">
+                <h4 className="text-sm font-bold font-display text-white">
+                  Export Verified Academic Records & Fee Statements
+                </h4>
+                <p className="text-xs text-stone-300">
+                  Generate vector printable PDF copies with official KNEC examination center formatting and institutional seals.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2 shrink-0">
+              <button
+                onClick={() => generateStudentReportPDF(selectedStudent, reportData)}
+                className="px-4 py-2.5 text-xs font-bold text-stone-950 bg-amber-400 hover:bg-amber-300 rounded-lg transition-all flex items-center gap-1.5 shadow-sm cursor-pointer hover:scale-102"
+              >
+                <Download className="w-4 h-4 text-stone-950" />
+                <span>Download Report Card (PDF)</span>
+              </button>
+
+              <button
+                onClick={() => generateFeeStatementPDF(selectedStudent)}
+                className="px-4 py-2.5 text-xs font-semibold text-white bg-stone-800 hover:bg-stone-700 border border-stone-700 rounded-lg transition-all flex items-center gap-1.5 shadow-sm cursor-pointer"
+              >
+                <Download className="w-4 h-4 text-amber-400" />
+                <span>Download Fee Statement (PDF)</span>
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
@@ -702,7 +763,15 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({ onNavigateToFees }
         </div>
       )}
 
-      {/* TAB 4: Revision & E-Learning */}
+      {/* TAB 4: Library Portal & OPAC Catalog */}
+      {activeTab === 'library' && (
+        <LibraryPortal 
+          studentAdmissionNo={selectedStudent.admissionNo}
+          onNavigateToPortal={() => setActiveTab('report')}
+        />
+      )}
+
+      {/* TAB 5: Revision & E-Learning */}
       {activeTab === 'resources' && (
         <div className="bg-white rounded-xl border border-stone-200 p-6 shadow-sm space-y-6">
           <div className="space-y-1">
