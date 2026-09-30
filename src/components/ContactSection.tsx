@@ -8,13 +8,10 @@ import {
   Send, 
   CheckCircle2, 
   Building, 
-  Bus,
-  ExternalLink,
-  Download,
-  Navigation,
-  Compass,
-  FileCode,
-  ShieldCheck
+  Bus, 
+  ExternalLink, 
+  Compass, 
+  ShieldCheck 
 } from 'lucide-react';
 
 export const ContactSection: React.FC = () => {
@@ -43,42 +40,6 @@ export const ContactSection: React.FC = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10">
-      {/* Download Project Source Code ZIP Banner */}
-      <div className="bg-gradient-to-r from-rose-950 via-stone-900 to-emerald-950 text-white rounded-2xl p-6 sm:p-8 relative overflow-hidden shadow-lg border border-stone-800">
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded bg-white/10 text-amber-300 text-xs font-medium">
-              <FileCode className="w-3.5 h-3.5 text-amber-400" />
-              <span>Full Project Source Code & Assets Available</span>
-            </div>
-            <h2 className="text-xl sm:text-2xl font-bold font-display">
-              Download Complete Project ZIP Archive
-            </h2>
-            <p className="text-stone-300 text-xs sm:text-sm max-w-2xl font-sans">
-              Export the complete codebase (React, TypeScript, Tailwind CSS, high-res photos of the gate, library, labs, fee payment system, student portals, and event calendar) as a ready-to-run ZIP archive for further editing or local deployment.
-            </p>
-          </div>
-
-          <div className="shrink-0">
-            <a
-              href="/nzuluni_high_school_project.zip"
-              download="nzuluni_high_school_project.zip"
-              className="px-5 py-3 text-xs sm:text-sm font-bold text-stone-950 bg-amber-400 hover:bg-amber-300 rounded-xl transition-all shadow-md flex items-center justify-center gap-2.5 cursor-pointer hover:scale-105 active:scale-95"
-            >
-              <Download className="w-4 h-4 text-stone-950" />
-              <span>Download Project ZIP (3.9 MB)</span>
-            </a>
-          </div>
-        </div>
-
-        {/* Heraldic Kenyan Colors Ribbon */}
-        <div className="absolute bottom-0 left-0 right-0 h-1 flex">
-          <div className="w-1/3 bg-black"></div>
-          <div className="w-1/3 bg-rose-700"></div>
-          <div className="w-1/3 bg-emerald-700"></div>
-        </div>
-      </div>
-
       {/* Main Header Banner */}
       <div className="bg-stone-900 text-white rounded-2xl p-6 sm:p-8 relative overflow-hidden shadow-sm">
         <div className="relative z-10 max-w-3xl space-y-2">
@@ -86,10 +47,10 @@ export const ContactSection: React.FC = () => {
             Physical Campus & Administrative Secretariat
           </span>
           <h1 className="text-2xl sm:text-4xl font-bold font-display">
-            Contact Nzuluni High School
+            Contact Nduluni High School
           </h1>
           <p className="text-stone-300 text-sm leading-relaxed">
-            Welcome to the official contact portal of Nzuluni High School. Reach the Chief Principal's office, bursar accounts department, boarding masters, or submit your admission and general inquiries directly below.
+            Welcome to the official contact portal of Nduluni High School. Reach the Chief Principal's office, bursar accounts department, boarding masters, or submit your admission and general inquiries directly below.
           </p>
         </div>
       </div>
@@ -104,8 +65,8 @@ export const ContactSection: React.FC = () => {
           <div>
             <h3 className="font-bold text-stone-900 text-sm">Physical Address</h3>
             <p className="text-xs text-stone-600 mt-1 leading-relaxed">
-              Nzuluni High School Main Campus<br />
-              Nzuluni Market Centre Corridor<br />
+              Nduluni High School Main Campus<br />
+              Nduluni Market Centre Corridor<br />
               Machakos County, Eastern Kenya
             </p>
           </div>
@@ -148,20 +109,20 @@ export const ContactSection: React.FC = () => {
             <div className="text-xs space-y-1.5 mt-1 font-mono">
               <div>
                 <span className="text-stone-500 block font-sans text-[11px]">General Inquiries:</span>
-                <a href="mailto:info@nzulunihigh.ac.ke" className="text-rose-900 hover:underline font-semibold">
-                  info@nzulunihigh.ac.ke
+                <a href="mailto:info@ndulunihigh.ac.ke" className="text-rose-900 hover:underline font-semibold">
+                  info@ndulunihigh.ac.ke
                 </a>
               </div>
               <div>
                 <span className="text-stone-500 block font-sans text-[11px]">Chief Principal Desk:</span>
-                <a href="mailto:principal@nzulunihigh.ac.ke" className="text-rose-900 hover:underline font-semibold">
-                  principal@nzulunihigh.ac.ke
+                <a href="mailto:principal@ndulunihigh.ac.ke" className="text-rose-900 hover:underline font-semibold">
+                  principal@ndulunihigh.ac.ke
                 </a>
               </div>
               <div>
                 <span className="text-stone-500 block font-sans text-[11px]">Admissions & NEMIS:</span>
-                <a href="mailto:admissions@nzulunihigh.ac.ke" className="text-rose-900 hover:underline font-semibold">
-                  admissions@nzulunihigh.ac.ke
+                <a href="mailto:admissions@ndulunihigh.ac.ke" className="text-rose-900 hover:underline font-semibold">
+                  admissions@ndulunihigh.ac.ke
                 </a>
               </div>
             </div>
@@ -202,7 +163,7 @@ export const ContactSection: React.FC = () => {
               <div>
                 <h3 className="font-bold text-stone-900 text-sm sm:text-base flex items-center gap-2">
                   <Compass className="w-4 h-4 text-rose-900" />
-                  <span>Google Maps: Nzuluni High School Location</span>
+                  <span>Google Maps: Nduluni High School Location</span>
                 </h3>
                 <p className="text-xs text-stone-500">
                   Coordinates: <span className="font-mono text-stone-700">1°45'30.0"S 37°37'30.0"E</span> · Machakos County
@@ -225,7 +186,7 @@ export const ContactSection: React.FC = () => {
             {/* Embedded Interactive Google Map Iframe */}
             <div className="relative w-full h-[360px] sm:h-[420px] bg-stone-100">
               <iframe
-                title="Nzuluni High School Map Location"
+                title="Nduluni High School Map Location"
                 width="100%"
                 height="100%"
                 frameBorder="0"
@@ -241,7 +202,7 @@ export const ContactSection: React.FC = () => {
               <div className="absolute top-4 left-4 z-10 bg-white/95 backdrop-blur-xs border border-stone-200 shadow-md rounded-lg p-3 max-w-xs text-xs space-y-1">
                 <div className="flex items-center gap-1.5 text-rose-950 font-bold">
                   <MapPin className="w-4 h-4 text-rose-800" />
-                  <span>Nzuluni High School Main Gate</span>
+                  <span>Nduluni High School Main Gate</span>
                 </div>
                 <p className="text-[11px] text-stone-600">
                   Off Kaiti - Wote Highway corridor, Machakos County.
@@ -262,11 +223,11 @@ export const ContactSection: React.FC = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-stone-600 leading-relaxed">
                 <div>
                   <strong className="text-stone-800 block mb-0.5">By Private Vehicle:</strong>
-                  From Nairobi or Machakos Town, follow the Machakos-Wote highway towards the Kaiti junction, branching into the Nduluni/Nzuluni educational center. Clear road signboards point directly to the main gate.
+                  From Nairobi or Machakos Town, follow the Machakos-Wote highway towards the Kaiti junction, branching into the Nduluni educational center. Clear road signboards point directly to the main gate.
                 </div>
                 <div>
                   <strong className="text-stone-800 block mb-0.5">By Public Matatu:</strong>
-                  Board matatus heading to Nduluni / Kaiti from the Machakos Central Bus Stage or Sultan Hamud Junction on Mombasa Road. Alight right at Nzuluni High School Gate 1.
+                  Board matatus heading to Nduluni / Kaiti from the Machakos Central Bus Stage or Sultan Hamud Junction on Mombasa Road. Alight right at Nduluni High School Gate 1.
                 </div>
               </div>
             </div>
@@ -292,7 +253,7 @@ export const ContactSection: React.FC = () => {
                   <h4 className="font-bold text-sm">Inquiry Dispatched Successfully</h4>
                 </div>
                 <p className="text-xs text-emerald-800 leading-relaxed">
-                  Thank you, <strong>{name}</strong>. Your message regarding <em>"{subject}"</em> has been received by the Nzuluni High School registry.
+                  Thank you, <strong>{name}</strong>. Your message regarding <em>"{subject}"</em> has been received by the Nduluni High School registry.
                 </p>
                 <div className="p-3 bg-white/80 rounded border border-emerald-200 text-[11px] font-mono text-emerald-900 space-y-0.5">
                   <p>Ticket No: <strong className="text-stone-900">NHS-INQ-{Math.floor(1000 + Math.random() * 9000)}</strong></p>
@@ -385,7 +346,7 @@ export const ContactSection: React.FC = () => {
                   className="w-full py-3 text-xs font-bold text-white bg-rose-950 hover:bg-rose-900 rounded-lg transition-colors shadow-sm flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <Send className="w-3.5 h-3.5" />
-                  <span>Transmit Inquiry to Nzuluni Secretariat</span>
+                  <span>Transmit Inquiry to Nduluni Secretariat</span>
                 </button>
               </form>
             )}

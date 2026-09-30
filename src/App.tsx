@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { Navbar } from './components/Navbar';
 import { HeroSection } from './components/HeroSection';
 import { StudentPortal } from './components/StudentPortal';
@@ -13,11 +14,16 @@ import { AcademicsSection } from './components/AcademicsSection';
 import { AdmissionsSection } from './components/AdmissionsSection';
 import { CampusSection } from './components/CampusSection';
 import { ContactSection } from './components/ContactSection';
+import { PrincipalDashboard } from './components/dashboards/PrincipalDashboard';
+import { BursarDashboard } from './components/dashboards/BursarDashboard';
+import { TeacherDashboard } from './components/dashboards/TeacherDashboard';
 import { Footer } from './components/Footer';
+import { AuthPortalModal } from './components/AuthPortalModal';
 
-export default function App() {
+function MainAppContent() {
   const [currentTab, setCurrentTab] = useState<string>('overview');
   const [targetAdmissionNo, setTargetAdmissionNo] = useState<string | undefined>(undefined);
+  const { role } = useAuth();
 
   // Scroll to top when changing tab
   const handleSelectTab = (tab: string) => {
@@ -34,7 +40,7 @@ export default function App() {
   };
 
   const handleNavigateToPortal = () => {
-    setCurrentTab('portal');
+    setCurrentTab('my_dashboard');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -49,8 +55,16 @@ export default function App() {
           <HeroSection onNavigate={handleSelectTab} />
         )}
 
-        {currentTab === 'portal' && (
-          <StudentPortal onNavigateToFees={handleNavigateToFees} />
+        {/* Dynamic Role-Based Unique Dashboard */}
+        {currentTab === 'my_dashboard' && (
+          <>
+            {role === 'PRINCIPAL' && <PrincipalDashboard />}
+            {role === 'BURSAR' && <BursarDashboard />}
+            {role === 'TEACHER' && <TeacherDashboard />}
+            {role === 'STUDENT_PARENT' && (
+              <StudentPortal onNavigateToFees={handleNavigateToFees} />
+            )}
+          </>
         )}
 
         {currentTab === 'fees' && (
@@ -83,6 +97,17 @@ export default function App() {
 
       {/* Institutional Footer */}
       <Footer onNavigate={handleSelectTab} />
+
+      {/* Role-Based Authentication & Registration Modal */}
+      <AuthPortalModal />
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <MainAppContent />
+    </AuthProvider>
   );
 }
